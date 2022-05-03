@@ -1,4 +1,5 @@
 import curses
+from curses.textpad import Textbox
 import time
 import sys
 
@@ -12,37 +13,86 @@ def print_slow(str):  #Humanized writing, action film vibe
 def main(stdscr):
     curses.curs_set(0)
     curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+    curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_RED)
+    curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_YELLOW)
     row_id = 0
     menu(stdscr, row_id)
     loop = True
     while loop:
+        global xstring
+        xstring = 0
+        xstring += 1
         kboard = stdscr.getch()
-        stdscr.clear()
-
-        if kboard == curses.KEY_DOWN:
-            row_id += 1
-            stdscr.addstr(0,0,"Downkey")
-
+        key = stdscr.getkey()
+        stdscr.addstr(5,5,f"Key: {key}")
         stdscr.refresh()
-        time.sleep(5)
+        stdscr.getch()
+        if key == "1":
+            #row_id -= 1
+            stdscr.clear()
+
+            stdscr.addstr(0,xstring,"Login, type pass below")
+            win = curses.newwin(2,15,3,3)
+            box = Textbox(win)
+            stdscr.refresh()
+            box.edit()
+            stdscr.getch()
+            txt = box.gather().strip().replace("\n", "")
+
+            if kboard == "KEY_HOME":
+                pass
+        if key == "2":
+            
+                #row_id -= 1
+                stdscr.clear()
+
+                stdscr.addstr(0,xstring,"Create account by making pass below.")
+                win = curses.newwin(2,15,3,3)
+                box = Textbox(win)
+                stdscr.refresh()
+                box.edit()
+                txt = box.gather().strip().replace("\n", "")
+                stdscr.getch()
+                if len(txt) > 0:
+                    stdscr.clear()
+                    with open("resource.txt", "w", encoding="utf8") as f:
+                        for line in txt:
+                            f.write(line)
+                            stdscr.addstr(5,1,"Saved")
+                            stdscr.refresh()
 
 
-myMenu = ["Login", "Create Account", "Exit"]
+                stdscr.refresh()
+
+            
+
+            
+        
+        stdscr.refresh()
+        time.sleep(2)
+
+
+myMenu = ["1 - Login", "2 - Create Account", "3 - Exit"]
 myTitle = "Welcome to suedibank"
 
 
 myList = ["1"]
 
+
+
+
+
 def menu(stdscr, row_id):
     stdscr.clear()
-
+    
     h, w = stdscr.getmaxyx()
     max_y, max_x = stdscr.getmaxyx()
     curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
     
     header = stdscr.subwin(1, (max_x//2)-(len(myTitle)//2))
+   # header = stdscr.subwin(1, xstring)
 
-    header.attron(curses.color_pair(1))
+    header.attron(curses.color_pair(3))
     header.addstr(myTitle)
     header.refresh()
 
@@ -64,7 +114,7 @@ def menu(stdscr, row_id):
         
 
 
-    time.sleep(5)
+    time.sleep(1)
 
 
 curses.wrapper(main)
