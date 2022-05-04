@@ -1,5 +1,6 @@
 import curses
 from curses.textpad import Textbox
+from encodings import utf_8
 import time
 import sys
 
@@ -22,7 +23,6 @@ def main(stdscr):
         global xstring
         xstring = 0
         xstring += 1
-        kboard = stdscr.getch()
         key = stdscr.getkey()
         stdscr.addstr(5,5,f"Key: {key}")
         stdscr.refresh()
@@ -45,6 +45,7 @@ def main(stdscr):
             
                 #row_id -= 1
                 stdscr.clear()
+                kboard = stdscr.getch()
 
                 stdscr.addstr(0,xstring,"Create account by making pass below.")
                 win = curses.newwin(2,15,3,3)
@@ -53,8 +54,8 @@ def main(stdscr):
                 box.edit()
                 txt = box.gather().strip().replace("\n", "")
                 stdscr.getch()
-                if len(txt) > 0:
-                    stdscr.clear()
+                if kboard == curses.KEY_RIGHT:
+                    
                     with open("resource.txt", "w", encoding="utf8") as f:
                         for line in txt:
                             f.write(line)
@@ -96,7 +97,21 @@ def menu(stdscr, row_id):
     header.addstr(myTitle)
     header.refresh()
 
+    with open("resource.txt", "r", encoding="utf8") as r:
+        for line in r.readlines():
+            attr = line.split("/")
+            user = attr[0]
+            password = attr[1]
+
+            stdscr.addstr(20,((w-w)+1), f"user:{user}")
+            stdscr.addstr(21,((w-w)+1), f"pass:{password}")
+
+            stdscr.refresh()
+
+
+
     for count, row in enumerate(myMenu):
+        
         x = w//2 - len(row)//2
         y = h//2 - len(myMenu)//2 + count
         if count == row_id:
