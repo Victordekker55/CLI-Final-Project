@@ -4,6 +4,17 @@ from encodings import utf_8
 import time
 import sys
 
+def check_login(stdscr, password):
+    with open("resource.txt", "r") as f:
+        for line in f.readlines():
+            attr = line.split("/")
+            pass1 = attr[1]
+            if password == pass1:
+                return stdscr.addstr("Login success")
+                login_page()
+    
+def login_page():
+    pass
 
 def print_slow(str):  #Humanized writing, action film vibe
     for letter in str:
@@ -16,64 +27,79 @@ def main(stdscr):
     curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
     curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_RED)
     curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_YELLOW)
+    stdscr.erase()
     row_id = 0
     menu(stdscr, row_id)
-    loop = True
-    while loop:
-        global xstring
-        xstring = 0
-        xstring += 1
-        key = stdscr.getkey()
-        stdscr.addstr(5,5,f"Key: {key}")
-        stdscr.refresh()
-        stdscr.getch()
+    h, w = stdscr.getmaxyx()
+    key = stdscr.getkey()
+    stdscr.refresh()
+    stdscr.addstr(7,2,f"Key{key}")
+    stdscr.refresh()
+    
+
+    while True:
         if key == "1":
             #row_id -= 1
             stdscr.clear()
+            key2 = stdscr.getch()
+            with open("resource.txt", "r", encoding="utf8") as r:
+                for line in r.readlines():
+                    attr = line.split("/")
+                    user = attr[0]
+                    password = attr[1]
 
-            stdscr.addstr(0,xstring,"Login, type pass below")
+                    stdscr.addstr(20,((w-w)+1), f"user:{user}")
+                    stdscr.addstr(21,((w-w)+1), f"pass:{password}")
+
+                    stdscr.refresh()
+            stdscr.addstr(0,1,"Login, type pass below")
             win = curses.newwin(2,15,3,3)
             box = Textbox(win)
             stdscr.refresh()
             box.edit()
             stdscr.getch()
             txt = box.gather().strip().replace("\n", "")
+            if key2 == curses.KEY_ENTER:
+                check_login(txt)
 
-            if kboard == "KEY_HOME":
-                pass
-        if key == "2":
             
-                #row_id -= 1
+           
+        if key == "2":
                 stdscr.clear()
-                kboard = stdscr.getch()
 
-                stdscr.addstr(0,xstring,"Create account by making pass below.")
-                win = curses.newwin(2,15,3,3)
-                box = Textbox(win)
+                #row_id -= 1
+
+                stdscr.addstr(0,1,"Create account by making pass below.")
                 stdscr.refresh()
+                
+                win = curses.newwin(2,15,3,3)
+                box = Textbox(win)             
                 box.edit()
-                txt = box.gather().strip().replace("\n", "")
-                stdscr.getch()
-                if kboard == curses.KEY_RIGHT:
-                    
+                txt2 = box.gather()
+                txt2 = txt2.replace("\n", "")
+                if len(txt) < 0 :
+                    stdscr.addstr(5,5, "saving")
+                    stdscr.refresh()
+                    txt = box.gather()
+                    txt = txt.replace("\n", "")
                     with open("resource.txt", "w", encoding="utf8") as f:
                         for line in txt:
-                            f.write(line)
-                            stdscr.addstr(5,1,"Saved")
-                            stdscr.refresh()
+                            f.write(line, "\n")
+                    stdscr.addstr(5,1,"Saved")
+                    stdscr.refresh()
 
 
-                stdscr.refresh()
+        elif key == "q":
+            return False        
 
             
 
             
         
         stdscr.refresh()
-        time.sleep(2)
 
 
-myMenu = ["1 - Login", "2 - Create Account", "3 - Exit"]
+myMenu = ["1 - Login", "2 - Create Account", "q - Exit"]
 myTitle = "Welcome to suedibank"
 
 
@@ -96,20 +122,11 @@ def menu(stdscr, row_id):
     header.attron(curses.color_pair(3))
     header.addstr(myTitle)
     header.refresh()
-
-    with open("resource.txt", "r", encoding="utf8") as r:
-        for line in r.readlines():
-            attr = line.split("/")
-            user = attr[0]
-            password = attr[1]
-
-            stdscr.addstr(20,((w-w)+1), f"user:{user}")
-            stdscr.addstr(21,((w-w)+1), f"pass:{password}")
-
-            stdscr.refresh()
+    
+    
 
 
-
+    stdscr.refresh()
     for count, row in enumerate(myMenu):
         
         x = w//2 - len(row)//2
@@ -129,7 +146,6 @@ def menu(stdscr, row_id):
         
 
 
-    time.sleep(1)
 
 
 curses.wrapper(main)
