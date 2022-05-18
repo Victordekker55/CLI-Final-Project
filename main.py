@@ -79,7 +79,7 @@ def login_page(stdscr, username):
                 attr = line.split("/")
                 money = attr[2]
                 money = int(money)
-                moneytxt = f"{money}btc"
+                moneytxt = f"{money} btc"
 
                 stdscr.addstr(1,1,f"Nice to have you here {username}, you have {moneytxt} in your wallet press + to add btc")
                 stdscr.addstr(max_y, max_x, f"BTC Wallet:{money}")
@@ -226,7 +226,6 @@ def main(stdscr):
                 for i in txt:
                                 
                     file.write(i)
-                file.write("\n")
                 stdscr.addstr(12,12, "Account has been created")
                 stdscr.refresh()
                 time.sleep(2)
